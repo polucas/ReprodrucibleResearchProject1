@@ -1,10 +1,11 @@
 ---
-title: "Reproducible Research project 1"
+title: "PA1"
 author: "Jed"
 date: "3 September 2017"
-output:
-  pdf_document: default
-  html_document: default
+output: 
+  html_document: 
+    keep_md: yes
+    toc: yes
 ---
 ## Introduction
 
@@ -39,7 +40,7 @@ NOTE: The GitHub repository also contains the dataset for the assignment so you 
 2. Load the data (i.e. read.csv())
 3. Process/transform the data (if necessary) into a format suitable for your analysis
 
-```{r}
+```{r, echo=TRUE}
 activity <- read.csv("C:/Docs/Data Science Course/ReproducibleRes/activity.csv")
 str(activity)
 library(ggplot2)
@@ -53,7 +54,7 @@ between a histogram and a barplot, research the difference between them.
 5. Make a histogram of the total number of steps taken each day
 6. Calculate and report the mean and median of the total number of steps taken per day
 
-```{r}
+```{r, echo=TRUE}
 ## Q1
 activityNA <- activity[complete.cases(activity),]
 str(activityNA)
@@ -73,7 +74,7 @@ number of steps taken, averaged across all days (y-axis)
 8. Which 5-minute interval, on average across all the days in the dataset, contains the maximum 
 number of steps?
 
-```{r} 
+```{r, echo=TRUE} 
 ## Q2
 stepsperinterval <- aggregate(activityNA$steps ~ activityNA$interval, data=activityNA, FUN=mean)
 head(stepsperinterval)
@@ -101,7 +102,7 @@ and median total number of steps taken per day. Do these values differ from the 
 first part of the assignment? What is the impact of imputing missing data on the estimates of the 
 total daily number of steps?
 
-``` {r}
+``` {r, echo=TRUE}
 ## Q3
 sum(is.na(activity$steps))
 activity1 <- activity
@@ -126,7 +127,7 @@ whether a given date is a weekday or weekend day.
 (y-axis). See the README file in the GitHub repository to see an example of what this plot should 
 look like using simulated data.
 
-```{r}
+```{r, echo=TRUE}
 ## Q4
 weekdays <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
 activity1$day = as.factor(ifelse(is.element(weekdays(as.Date(activity1$date)),weekdays), 
@@ -141,3 +142,15 @@ ggplot(stepsperintervalperday, aes(x=stepsperintervalperday[,1], y=stepsperinter
     labs(title="Average daily steps per interval per day type", x="interval", 
          y="average steps per day") + facet_wrap (~ stepsperintervalperday[,2], ncol=1, nrow=2)
 ```
+
+
+
+
+
+
+
+
+
+
+
+

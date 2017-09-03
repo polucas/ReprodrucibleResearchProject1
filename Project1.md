@@ -1,11 +1,6 @@
----
-title: "Reproducible Research project 1"
-author: "Jed"
-date: "3 September 2017"
-output:
-  pdf_document: default
-  html_document: default
----
+# PA1
+Jed  
+3 September 2017  
 ## Introduction
 
 It is now possible to collect a large amount of data about personal movement using activity monitoring devices such as a Fitbit, Nike Fuelband, or Jawbone Up. These type of devices are part of the ???quantified self??? movement ??? a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. But these data remain under-utilized both because the raw data are hard to obtain and there is a lack of statistical methods and software for processing and interpreting the data.
@@ -39,9 +34,20 @@ NOTE: The GitHub repository also contains the dataset for the assignment so you 
 2. Load the data (i.e. read.csv())
 3. Process/transform the data (if necessary) into a format suitable for your analysis
 
-```{r}
+
+```r
 activity <- read.csv("C:/Docs/Data Science Course/ReproducibleRes/activity.csv")
 str(activity)
+```
+
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
+```
+
+```r
 library(ggplot2)
 ```
 
@@ -53,19 +59,55 @@ between a histogram and a barplot, research the difference between them.
 5. Make a histogram of the total number of steps taken each day
 6. Calculate and report the mean and median of the total number of steps taken per day
 
-```{r}
+
+```r
 ## Q1
 activityNA <- activity[complete.cases(activity),]
 str(activityNA)
+```
+
+```
+## 'data.frame':	15264 obs. of  3 variables:
+##  $ steps   : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ date    : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 2 2 2 2 2 2 2 2 2 2 ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
+```
+
+```r
 totalsteps <- aggregate( steps ~ date, data=activity, FUN=sum, na.rm=T)
 str(totalsteps)
+```
+
+```
+## 'data.frame':	53 obs. of  2 variables:
+##  $ date : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 2 3 4 5 6 7 9 10 11 12 ...
+##  $ steps: int  126 11352 12116 13294 15420 11015 12811 9900 10304 17382 ...
+```
+
+```r
 ggplot(totalsteps, aes(x=steps)) + geom_histogram(fill="blue", col="black", binwidth=1000)+
       labs(title="Total daily steps per day", x="total number of steps", y="frequency")
+```
+
+![](Project1_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
+```r
 meansteps <- mean(totalsteps$steps)
 meansteps
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 mediansteps <- median(totalsteps$steps)
 mediansteps
-``` 
+```
+
+```
+## [1] 10765
+```
 
 ## Q2 What is the average daily activity pattern?
 7. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average 
@@ -73,18 +115,54 @@ number of steps taken, averaged across all days (y-axis)
 8. Which 5-minute interval, on average across all the days in the dataset, contains the maximum 
 number of steps?
 
-```{r} 
+
+```r
 ## Q2
 stepsperinterval <- aggregate(activityNA$steps ~ activityNA$interval, data=activityNA, FUN=mean)
 head(stepsperinterval)
+```
+
+```
+##   activityNA$interval activityNA$steps
+## 1                   0        1.7169811
+## 2                   5        0.3396226
+## 3                  10        0.1320755
+## 4                  15        0.1509434
+## 5                  20        0.0754717
+## 6                  25        2.0943396
+```
+
+```r
 ggplot(stepsperinterval, aes(x=stepsperinterval[,1], y=stepsperinterval[,2])) + 
       geom_line(color="blue", size=1) + 
       labs(title="Average daily steps per interval", x="Interval", y="average steps per day")
+```
 
+![](Project1_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+```r
 ordered <- stepsperinterval[order(-stepsperinterval[,2]),]
 head(ordered)
+```
+
+```
+##     activityNA$interval activityNA$steps
+## 104                 835         206.1698
+## 105                 840         195.9245
+## 107                 850         183.3962
+## 106                 845         179.5660
+## 103                 830         177.3019
+## 101                 820         171.1509
+```
+
+```r
 maxinterval <- ordered[1,]
 maxinterval
+```
+
+```
+##     activityNA$interval activityNA$steps
+## 104                 835         206.1698
 ```
 
 ## Q3 Imputing missing values
@@ -101,20 +179,78 @@ and median total number of steps taken per day. Do these values differ from the 
 first part of the assignment? What is the impact of imputing missing data on the estimates of the 
 total daily number of steps?
 
-``` {r}
+
+```r
 ## Q3
 sum(is.na(activity$steps))
+```
+
+```
+## [1] 2304
+```
+
+```r
 activity1 <- activity
 na <- is.na(activity1$steps)
 avgint <- tapply(activity1$steps, activity1$interval, mean, na.rm=T)
 activity1$steps[na] <- avgint[as.character(activity1$interval[na])]
 head(activity1)
+```
+
+```
+##       steps       date interval
+## 1 1.7169811 2012-10-01        0
+## 2 0.3396226 2012-10-01        5
+## 3 0.1320755 2012-10-01       10
+## 4 0.1509434 2012-10-01       15
+## 5 0.0754717 2012-10-01       20
+## 6 2.0943396 2012-10-01       25
+```
+
+```r
 sum(is.na(activity1$steps))
+```
+
+```
+## [1] 0
+```
+
+```r
 totalsteps1 <- aggregate( steps ~ date, data=activity1, FUN=sum)
 ggplot(totalsteps1, aes(x=steps)) + geom_histogram(fill="blue", col="black", binwidth=1000)+
     labs(title="Total daily steps per day", x="total number of steps", y="frequency")
+```
+
+![](Project1_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
+```r
 summary(totalsteps)
+```
+
+```
+##          date        steps      
+##  2012-10-02: 1   Min.   :   41  
+##  2012-10-03: 1   1st Qu.: 8841  
+##  2012-10-04: 1   Median :10765  
+##  2012-10-05: 1   Mean   :10766  
+##  2012-10-06: 1   3rd Qu.:13294  
+##  2012-10-07: 1   Max.   :21194  
+##  (Other)   :47
+```
+
+```r
 summary(totalsteps1)
+```
+
+```
+##          date        steps      
+##  2012-10-01: 1   Min.   :   41  
+##  2012-10-02: 1   1st Qu.: 9819  
+##  2012-10-03: 1   Median :10766  
+##  2012-10-04: 1   Mean   :10766  
+##  2012-10-05: 1   3rd Qu.:12811  
+##  2012-10-06: 1   Max.   :21194  
+##  (Other)   :55
 ```
 
 ## Q4 Are there differences in activity patterns between weekdays and weekends?
@@ -126,18 +262,59 @@ whether a given date is a weekday or weekend day.
 (y-axis). See the README file in the GitHub repository to see an example of what this plot should 
 look like using simulated data.
 
-```{r}
+
+```r
 ## Q4
 weekdays <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
 activity1$day = as.factor(ifelse(is.element(weekdays(as.Date(activity1$date)),weekdays), 
                                     "Weekday", "Weekend"))
 head(activity1)
+```
+
+```
+##       steps       date interval     day
+## 1 1.7169811 2012-10-01        0 Weekday
+## 2 0.3396226 2012-10-01        5 Weekday
+## 3 0.1320755 2012-10-01       10 Weekday
+## 4 0.1509434 2012-10-01       15 Weekday
+## 5 0.0754717 2012-10-01       20 Weekday
+## 6 2.0943396 2012-10-01       25 Weekday
+```
+
+```r
 stepsperintervalperday <- aggregate(activity1$steps ~ activity1$interval + activity1$day, 
                                     data=activity1, FUN=mean)
 head(stepsperintervalperday)
+```
+
+```
+##   activity1$interval activity1$day activity1$steps
+## 1                  0       Weekday      2.25115304
+## 2                  5       Weekday      0.44528302
+## 3                 10       Weekday      0.17316562
+## 4                 15       Weekday      0.19790356
+## 5                 20       Weekday      0.09895178
+## 6                 25       Weekday      1.59035639
+```
+
+```r
 ggplot(stepsperintervalperday, aes(x=stepsperintervalperday[,1], y=stepsperintervalperday[,3], 
                                    color = stepsperintervalperday[,2])) + 
     geom_line(size=1) +
     labs(title="Average daily steps per interval per day type", x="interval", 
          y="average steps per day") + facet_wrap (~ stepsperintervalperday[,2], ncol=1, nrow=2)
 ```
+
+![](Project1_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+
+
+
+
+
+
+
+
+
+
+
+
